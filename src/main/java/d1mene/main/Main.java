@@ -4,17 +4,14 @@ import d1mene.client.APIClient;
 import d1mene.client.CoinGeckoClient;
 import d1mene.client.OpenExchangeRatesClient;
 import d1mene.client.WeatherAPIClient;
-import d1mene.service.AggregatorService;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 public class Main {
 
     public static final Map<String, APIClient> AVAILABLE_CLIENTS = new LinkedHashMap<>();
-    public static final AggregatorService AGGREGATOR = new AggregatorService();
 
     public static void main(String[] args) {
         try {

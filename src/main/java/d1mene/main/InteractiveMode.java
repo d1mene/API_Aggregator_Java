@@ -2,15 +2,12 @@ package d1mene.main;
 
 import d1mene.client.APIClient;
 import d1mene.data.APIRecord;
-import d1mene.storage.CSVStorage;
-import d1mene.storage.FileStorage;
-import d1mene.storage.JSONStorage;
-import d1mene.storage.WriteMode;
+import d1mene.service.PullingManager;
+import d1mene.storage.*;
+import d1mene.storage.ThreadStorage;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -18,6 +15,22 @@ import java.util.Scanner;
 public class InteractiveMode {
 
     private static final Scanner scanner = new Scanner(System.in);
+
+    private static void startPulling(PullingManager manager, List<APIClient> clients) {
+        if (manager.isActive()) {
+            System.out.println("Опрос уже запущен.");
+            return;
+        }
+        manager.start(clients);
+    }
+
+    private static void stopPulling(PullingManager manager) {
+        if (!manager.isActive()) {
+            System.out.println("Опрос не запущен.");
+            return;
+        }
+        manager.stop();
+    }
 
     public static void run() {
         System.out.println("=== Агрегатор данных ===");
@@ -30,30 +43,48 @@ public class InteractiveMode {
 
         String format = selectFormat();
         String outputPath = selectOutputPath(format);
-        WriteMode writeMode = selectWriteMode(outputPath);
+        WriteMode writeMode = selectWriteMode();
+        int n = selectN();
+        long t = selectT();
 
-        FileStorage storage = createStorage(format, outputPath);
+        FileStorage baseStorage;
+        try {
+            baseStorage = ParamsHandler.createStorage(format, outputPath);
+        } catch (IllegalArgumentException e) {
+            System.err.println("Ошибка: " + e.getMessage());
+            return;
+        }
+        ThreadStorage storage = new ThreadStorage(baseStorage);
+
+        Map<String, Map<String, String>> params = ParamsHandler.buildDefaultParams(clients);
+        PullingManager pullingManager = new PullingManager(n, t, storage, params, writeMode);
 
         boolean running = true;
         while (running) {
-            System.out.println("\n=== Меню ===");
-            System.out.println("1. Запросить данные и сохранить");
-            System.out.println("2. Вывести всё содержимое файла");
-            System.out.println("3. Вывести данные по конкретному API");
-            System.out.println("4. Выход");
+            System.out.println("\n--- Меню ---");
+            System.out.println("1. Запустить опрос");
+            System.out.println("2. Остановить опрос");
+            System.out.println("3. Вывести всё содержимое файла");
+            System.out.println("4. Вывести данные по конкретному API");
+            System.out.println("5. Выход");
             System.out.print("Выберите: ");
 
             String choice = scanner.nextLine().trim();
 
             switch (choice) {
-                case "1" -> fetchAndSave(clients, storage, writeMode);
-                case "2" -> printAll(storage);
-                case "3" -> printBySource(storage);
-                case "4" -> running = false;
+                case "1" -> startPulling(pullingManager, clients);
+                case "2" -> stopPulling(pullingManager);
+                case "3" -> printAll(storage);
+                case "4" -> printBySource(storage);
+                case "5" -> running = false;
                 default -> System.err.println("Неверный ввод.");
             }
         }
 
+        if (pullingManager.isActive()) {
+            pullingManager.stop();
+        }
+        storage.shutdown();
         System.out.println("Завершение работы.");
     }
 
@@ -97,49 +128,41 @@ public class InteractiveMode {
     private static String selectOutputPath(String format) {
         System.out.print("Имя выходного файла: ");
         String name = scanner.nextLine().trim();
-
         if (!name.endsWith("." + format)) {
             name = name + "." + format;
         }
-
         return name;
     }
 
-    private static WriteMode selectWriteMode(String outputPath) {
+    private static WriteMode selectWriteMode() {
+        System.out.print("Режим записи — создать новый (new) или дозаписать (append): ");
+        String input = scanner.nextLine().trim().toLowerCase();
+        return input.equals("append") ? WriteMode.APPEND : WriteMode.CREATE;
+    }
+
+    private static int selectN() {
         while (true) {
-            System.out.print("\nРежим записи — создать новый (new) или дозаписать (append): ");
-            String input = scanner.nextLine().trim().toLowerCase();
-            if (input.equals("append")) {
-                return WriteMode.APPEND;
-            } else if (input.equals("new")) {
-                return WriteMode.CREATE;
+            System.out.print("Максимальное количество одновременных задач (n): ");
+            try {
+                int n = Integer.parseInt(scanner.nextLine().trim());
+                if (n > 0) return n;
+                System.err.println("n должно быть больше 0.");
+            } catch (NumberFormatException e) {
+                System.err.println("Введите целое число.");
             }
-            System.err.println("Неизвестная опция: " + input
-                        + ". Используйте new или append.");
         }
     }
 
-    private static FileStorage createStorage(String format, String outputPath) {
-        return switch (format.toLowerCase()) {
-            case "json" -> new JSONStorage(outputPath);
-            case "csv" -> new CSVStorage(outputPath);
-            default -> throw new IllegalArgumentException("Неизвестный формат: " + format
-                    + ". Используйте json или csv.");
-        };
-    }
-
-    private static void fetchAndSave(List<APIClient> clients, FileStorage storage, WriteMode writeMode) {
-        Map<String, Map<String, String>> params = buildDefaultParams(clients);
-        Map<String, List<APIRecord>> aggregated = Main.AGGREGATOR.aggregate(clients, params);
-
-        List<APIRecord> allRecords = new ArrayList<>();
-        aggregated.values().forEach(allRecords::addAll);
-
-        try {
-            storage.save(allRecords, writeMode);
-            System.out.println("Данные сохранены.");
-        } catch (IOException e) {
-            System.err.println("Ошибка сохранения: " + e.getMessage());
+    private static long selectT() {
+        while (true) {
+            System.out.print("Интервал опроса в секундах (t): ");
+            try {
+                long t = Long.parseLong(scanner.nextLine().trim());
+                if (t > 0) return t;
+                System.err.println("t должно быть больше 0.");
+            } catch (NumberFormatException e) {
+                System.err.println("Введите целое число.");
+            }
         }
     }
 
@@ -157,7 +180,7 @@ public class InteractiveMode {
     }
 
     private static void printBySource(FileStorage storage) {
-        System.out.print("Введите имя API (CoinGecko/WeatherAPI/ OpenExchangeRates): ");
+        System.out.print("Введите имя API (CoinGecko / WeatherAPI / OpenExchangeRates): ");
         String source = scanner.nextLine().trim();
         try {
             List<APIRecord> records = storage.readBySource(source);
@@ -169,31 +192,5 @@ public class InteractiveMode {
         } catch (IOException e) {
             System.err.println("Ошибка чтения: " + e.getMessage());
         }
-    }
-
-    private static Map<String, Map<String, String>> buildDefaultParams(List<APIClient> clients) {
-        Map<String, Map<String, String>> params = new HashMap<>();
-        for (APIClient client : clients) {
-            params.put(client.getSourceName(), defaultParamsFor(client.getSourceName()));
-        }
-        return params;
-    }
-
-    private static Map<String, String> defaultParamsFor(String apiName) {
-        return switch (apiName) {
-            case "CoinGecko" -> Map.of("vs_currency", "usd", "ids", "bitcoin,ethereum");
-            case "WeatherAPI" -> {
-                Map<String, String> weatherMap = new HashMap<>();
-                weatherMap.put("q", "Moscow");
-                weatherMap.put("aqi", "yes");
-                yield weatherMap;
-            }
-            case "OpenExchangeRates" -> {
-                Map<String, String> ratesMap = new HashMap<>();
-                ratesMap.put("symbols", "EUR,RUB,GBP,CNY");
-                yield ratesMap;
-            }
-            default -> new HashMap<>();
-        };
     }
 }

@@ -1,14 +1,12 @@
 package d1mene.main;
 
 import d1mene.client.APIClient;
-import d1mene.data.APIRecord;
-import d1mene.storage.CSVStorage;
+import d1mene.service.PullingManager;
 import d1mene.storage.FileStorage;
-import d1mene.storage.JSONStorage;
+import d1mene.storage.ThreadStorage;
 import d1mene.storage.WriteMode;
-import java.io.IOException;
+
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,17 +17,41 @@ public class AutoMode {
         String apisArg = null;
         String formatArg = null;
         String outputArg = null;
+        int n = 3;
+        long t = 10;
 
         for (int i = 0; i < args.length; i++) {
             switch (args[i]) {
                 case "--apis" -> apisArg = args[++i];
                 case "--format" -> formatArg = args[++i];
                 case "--output" -> outputArg = args[++i];
+                case "--n" -> {
+                    try {
+                        n = Integer.parseInt(args[++i]);
+                        if (n <= 0) {
+                            System.err.println("n должно быть больше 0, используется значение по умолчанию: 3");
+                            n = 3;
+                        }
+                    } catch (NumberFormatException e) {
+                        System.err.println("Некорректное значение n, используется значение по умолчанию: 3");
+                    }
+                }
+                case "--t" -> {
+                    try {
+                        t = Long.parseLong(args[++i]);
+                        if (t <= 0) {
+                            System.err.println("t должно быть больше 0, используется значение по умолчанию: 10");
+                            t = 10;
+                        }
+                    } catch (NumberFormatException e) {
+                        System.err.println("Некорректное значение t, используется значение по умолчанию: 10");
+                    }
+                }
             }
         }
 
         if (apisArg == null || formatArg == null || outputArg == null) {
-            System.err.println("Использование: --apis <api1,api2> --format <json|csv> --output <file>");
+            System.err.println("Использование: --apis <api1,api2> --format <json|csv> --output <file> --n <число> --t <секунды>");
             return;
         }
 
@@ -37,7 +59,7 @@ public class AutoMode {
             outputArg = outputArg + "." + formatArg.toLowerCase();
         }
 
-        List<String> apiNames = Arrays.asList(apisArg.split(","));
+        String[] apiNames = apisArg.split(",");
         List<APIClient> clients = new ArrayList<>();
 
         for (String name : apiNames) {
@@ -49,57 +71,49 @@ public class AutoMode {
             clients.add(client);
         }
 
-        Map<String, Map<String, String>> params = buildDefaultParams(apiNames);
-        Map<String, List<APIRecord>> aggregated = Main.AGGREGATOR.aggregate(clients, params);
-
-        List<APIRecord> allRecords = new ArrayList<>();
-        aggregated.values().forEach(allRecords::addAll);
-
-        FileStorage storage = createStorage(formatArg, outputArg);
-        if (storage == null) {
+        FileStorage baseStorage;
+        try {
+            baseStorage = ParamsHandler.createStorage(formatArg, outputArg);
+        } catch (IllegalArgumentException e) {
+            System.err.println("Ошибка: " + e.getMessage());
             return;
         }
 
-        try {
-            storage.save(allRecords, WriteMode.CREATE);
-            System.out.println("Данные сохранены в " + outputArg);
-        } catch (IOException e) {
-            System.err.println("Ошибка сохранения: " + e.getMessage());
-        }
-    }
+        ThreadStorage storage = new ThreadStorage(baseStorage);
+        Map<String, Map<String, String>> params = ParamsHandler.buildDefaultParams(clients);
+        PullingManager pullingManager = new PullingManager(n, t, storage, params, WriteMode.APPEND);
 
-    private static FileStorage createStorage(String format, String outputPath) {
-        return switch (format.toLowerCase()) {
-            case "json" -> new JSONStorage(outputPath);
-            case "csv" -> new CSVStorage(outputPath);
-            default -> {
-                System.err.println("Неизвестный формат: " + format + ". Используйте json или csv.");
-                yield null;
-            }
-        };
-    }
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            System.out.println("\nПолучен сигнал остановки...");
+            pullingManager.stop();
+            storage.shutdown();
+            System.out.println("Ресурсы освобождены.");
+        }));
 
-    private static Map<String, Map<String, String>> buildDefaultParams(List<String> apiNames) {
-        Map<String, Map<String, String>> params = new HashMap<>();
-        for (String name : apiNames) {
-            params.put(name.trim(), defaultParamsFor(name.trim()));
-        }
-        return params;
+        System.out.println("Запуск опроса: APIs=" + apisArg + ", n=" + n + ", t=" + t + "с, файл=" + outputArg);
+        pullingManager.start(clients);
+
+        System.out.println("Опрос запущен. Для остановки нажмите Ctrl+C.");
     }
 
     private static Map<String, String> defaultParamsFor(String apiName) {
         return switch (apiName) {
-            case "CoinGecko" -> Map.of("vs_currency", "usd", "ids", "bitcoin,ethereum");
+            case "CoinGecko" -> {
+                Map<String, String> p = new HashMap<>();
+                p.put("vs_currency", "usd");
+                p.put("ids", "bitcoin,ethereum");
+                yield p;
+            }
             case "WeatherAPI" -> {
-                Map<String, String> weatherMap = new HashMap<>();
-                weatherMap.put("q", "Moscow");
-                weatherMap.put("aqi", "yes");
-                yield weatherMap;
+                Map<String, String> p = new HashMap<>();
+                p.put("q", "Moscow");
+                p.put("aqi", "yes");
+                yield p;
             }
             case "OpenExchangeRates" -> {
-                Map<String, String> ratesMap = new HashMap<>();
-                ratesMap.put("symbols", "EUR,RUB,GBP,CNY");
-                yield ratesMap;
+                Map<String, String> p = new HashMap<>();
+                p.put("symbols", "EUR,RUB,GBP,CNY");
+                yield p;
             }
             default -> new HashMap<>();
         };
