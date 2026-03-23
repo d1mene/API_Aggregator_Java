@@ -6,8 +6,8 @@ import d1mene.storage.FileStorage;
 import d1mene.storage.ThreadStorage;
 import d1mene.storage.WriteMode;
 
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -92,30 +92,14 @@ public class AutoMode {
 
         System.out.println("Запуск опроса: APIs=" + apisArg + ", n=" + n + ", t=" + t + "с, файл=" + outputArg);
         pullingManager.start(clients);
+        System.out.println("Опрос запущен. Нажмите Enter для остановки.");
 
-        System.out.println("Опрос запущен. Для остановки нажмите Ctrl+C.");
-    }
+        try {
+            System.in.read();
+        } catch (IOException e) {
+            System.err.println("Ошибка чтения ввода: " + e.getMessage());
+        }
 
-    private static Map<String, String> defaultParamsFor(String apiName) {
-        return switch (apiName) {
-            case "CoinGecko" -> {
-                Map<String, String> p = new HashMap<>();
-                p.put("vs_currency", "usd");
-                p.put("ids", "bitcoin,ethereum");
-                yield p;
-            }
-            case "WeatherAPI" -> {
-                Map<String, String> p = new HashMap<>();
-                p.put("q", "Moscow");
-                p.put("aqi", "yes");
-                yield p;
-            }
-            case "OpenExchangeRates" -> {
-                Map<String, String> p = new HashMap<>();
-                p.put("symbols", "EUR,RUB,GBP,CNY");
-                yield p;
-            }
-            default -> new HashMap<>();
-        };
+        System.exit(0);
     }
 }

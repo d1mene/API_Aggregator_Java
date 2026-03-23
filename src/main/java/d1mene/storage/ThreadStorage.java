@@ -45,6 +45,11 @@ public class ThreadStorage implements FileStorage {
     public void shutdown() {
         running = false;
         writerThread.interrupt();
+        try {
+            writerThread.join(10009);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 
     private void writerLoop() {
@@ -54,9 +59,8 @@ public class ThreadStorage implements FileStorage {
                 if (records != null) {
                     delegate.save(records, WriteMode.APPEND);
                 }
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            } catch (IOException e) {
+            } catch (InterruptedException ignored) {}
+            catch (IOException e) {
                 System.err.println("Ошибка записи в файл: " + e.getMessage());
             }
         }

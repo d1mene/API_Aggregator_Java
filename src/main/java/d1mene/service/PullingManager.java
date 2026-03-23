@@ -3,6 +3,7 @@ package d1mene.service;
 import d1mene.client.APIClient;
 import d1mene.storage.FileStorage;
 import d1mene.storage.WriteMode;
+import lombok.Getter;
 
 import java.util.List;
 import java.util.Map;
@@ -13,7 +14,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 public class PullingManager {
-
     private final ThreadPoolExecutor executor;
     private final ScheduledExecutorService dispatcher;
     private final FileStorage storage;
@@ -24,6 +24,7 @@ public class PullingManager {
     private final ConcurrentHashMap<String, Long> lastFinishedTime = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, Boolean> runningTasks = new ConcurrentHashMap<>();
 
+    @Getter
     private volatile boolean active = false;
 
     public PullingManager(int n, long t, FileStorage storage,
@@ -46,8 +47,15 @@ public class PullingManager {
     public void stop() {
         active = false;
         dispatcher.shutdown();
-        executor.shutdown();
+        try {
+            if (!dispatcher.awaitTermination(5, TimeUnit.SECONDS)) {
+                System.err.println("Диспатчер не завершился за 5 секунд");
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
 
+        executor.shutdown();
         try {
             if (!executor.awaitTermination(10, TimeUnit.SECONDS)) {
                 executor.shutdownNow();
@@ -56,7 +64,6 @@ public class PullingManager {
             executor.shutdownNow();
             Thread.currentThread().interrupt();
         }
-
         System.out.println("Опрос остановлен.");
     }
 
@@ -66,7 +73,9 @@ public class PullingManager {
     }
 
     private void dispatch(List<APIClient> clients) {
-        if (!active) return;
+        if (!active) {
+            return;
+        }
 
         long now = System.currentTimeMillis();
 
@@ -74,13 +83,19 @@ public class PullingManager {
             String sourceName = client.getSourceName();
 
             boolean isRunning = runningTasks.getOrDefault(sourceName, false);
-            if (isRunning) continue;
+            if (isRunning) {
+                continue;
+            }
 
             long lastFinished = lastFinishedTime.getOrDefault(sourceName, 0L);
             long elapsed = (now - lastFinished) / 1000;
-            if (elapsed < intervalSeconds) continue;
+            if (elapsed < intervalSeconds) {
+                continue;
+            }
 
-            if (executor.getActiveCount() >= executor.getMaximumPoolSize()) continue;
+            if (executor.getActiveCount() >= executor.getMaximumPoolSize()) {
+                continue;
+            }
 
             runningTasks.put(sourceName, true);
             Map<String, String> params = paramsPerClient.getOrDefault(sourceName, Map.of());
@@ -88,7 +103,4 @@ public class PullingManager {
         }
     }
 
-    public boolean isActive() {
-        return active;
-    }
 }

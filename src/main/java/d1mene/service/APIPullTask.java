@@ -1,10 +1,12 @@
 package d1mene.service;
 
+import com.google.gson.JsonSyntaxException;
 import d1mene.client.APIClient;
 import d1mene.data.APIRecord;
 import d1mene.storage.FileStorage;
 import d1mene.storage.WriteMode;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -43,9 +45,13 @@ public class APIPullTask implements Runnable {
                 System.out.println("[" + sourceName + "] Получено и сохранено записей: " + records.size());
             }
 
-        } catch (Exception e) {
-            System.err.println("[" + sourceName + "] Ошибка опроса: " + e.getMessage());
-        } finally {
+        } catch (IOException e) {
+            System.err.println("[" + sourceName + "] Ошибка IO: " + e.getMessage());
+        } catch (JsonSyntaxException e) {
+            System.err.println("[" + sourceName + "] Ошибка JSON: " + e.getMessage());
+        }
+        finally
+        {
             manager.onTaskFinished(sourceName);
         }
     }
