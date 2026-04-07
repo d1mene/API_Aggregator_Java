@@ -4,6 +4,7 @@ import d1mene.client.APIClient;
 import d1mene.client.CoinGeckoClient;
 import d1mene.client.OpenExchangeRatesClient;
 import d1mene.client.WeatherAPIClient;
+import d1mene.user_input.InteractiveMode;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;

@@ -1,10 +1,13 @@
-package d1mene.main;
+package d1mene.user_input;
 
 import d1mene.client.APIClient;
 import d1mene.data.APIRecord;
+import d1mene.main.Main;
+import d1mene.main.ParamsHandler;
 import d1mene.service.PullingManager;
 import d1mene.storage.*;
 import d1mene.storage.ThreadStorage;
+import lombok.Setter;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -14,7 +17,8 @@ import java.util.Scanner;
 
 public class InteractiveMode {
 
-    private static final Scanner scanner = new Scanner(System.in);
+    @Setter
+    private static Scanner scanner = new Scanner(System.in);
 
     private static void startPulling(PullingManager manager, List<APIClient> clients) {
         if (manager.isActive()) {

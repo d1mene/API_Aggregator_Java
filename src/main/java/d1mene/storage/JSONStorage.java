@@ -63,14 +63,18 @@ public class JSONStorage implements FileStorage {
     @Override
     public List<APIRecord> readAll() throws IOException {
         List<APIRecord> result = new ArrayList<>();
-        if (!Files.exists(filePath)) return result;
+        if (!Files.exists(filePath)) {
+            return result;
+        }
 
         for (JsonElement element : readRawArray()) {
             JsonObject entry = element.getAsJsonObject();
             String source = entry.get("source").getAsString();
             JsonObject data = entry.getAsJsonObject("data");
             APIRecord record = deserialize(source, data);
-            if (record != null) result.add(record);
+            if (record != null) {
+                result.add(record);
+            }
         }
 
         return result;

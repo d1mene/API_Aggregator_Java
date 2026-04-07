@@ -1,0 +1,236 @@
+[
+  {
+    "id": 1,
+    "source": "WeatherAPI",
+    "timestamp": "2026-03-24T11:24:34+00:00",
+    "data": {
+      "location": {
+        "name": "Moscow",
+        "country": "Russia",
+        "localtime": "2026-03-24 14:24"
+      },
+      "current": {
+        "temp_c": 11.2,
+        "feelslike_c": 9.7,
+        "humidity": 35,
+        "wind_kph": 12.2,
+        "condition": {
+          "text": "Partly Cloudy"
+        },
+        "air_quality": {
+          "co": 1041.85,
+          "pm2_5": 91.15,
+          "pm10": 104.05
+        }
+      }
+    }
+  },
+  {
+    "id": 2,
+    "source": "CoinGecko",
+    "timestamp": "2026-03-24T11:24:35+00:00",
+    "data": {
+      "id": "bitcoin",
+      "symbol": "btc",
+      "name": "Bitcoin",
+      "current_price": 70993.0,
+      "market_cap": 1.419907055169E12,
+      "price_change_24h": 514.78,
+      "price_change_percentage_24h": 0.73041,
+      "last_updated": "2026-03-24T11:24:22.156Z"
+    }
+  },
+  {
+    "id": 3,
+    "source": "CoinGecko",
+    "timestamp": "2026-03-24T11:24:35+00:00",
+    "data": {
+      "id": "ethereum",
+      "symbol": "eth",
+      "name": "Ethereum",
+      "current_price": 2156.81,
+      "market_cap": 2.60118571993E11,
+      "price_change_24h": 2.9,
+      "price_change_percentage_24h": 0.13487,
+      "last_updated": "2026-03-24T11:24:24.680Z",
+      "roi": {
+        "times": 39.6229095567787,
+        "currency": "btc",
+        "percentage": 3962.29095567787
+      }
+    }
+  },
+  {
+    "id": 4,
+    "source": "OpenExchangeRates",
+    "timestamp": "2026-03-24T11:24:39+00:00",
+    "data": {
+      "disclaimer": "Usage subject to terms: https://openexchangerates.org/terms",
+      "license": "https://openexchangerates.org/license",
+      "timestamp": 1774350000,
+      "base": "USD",
+      "rates": {
+        "CNY": 6.8915,
+        "EUR": 0.862648,
+        "GBP": 0.745965,
+        "RUB": 80.498577
+      }
+    }
+  },
+  {
+    "id": 5,
+    "source": "WeatherAPI",
+    "timestamp": "2026-03-24T11:24:46+00:00",
+    "data": {
+      "location": {
+        "name": "Moscow",
+        "country": "Russia",
+        "localtime": "2026-03-24 14:24"
+      },
+      "current": {
+        "temp_c": 11.2,
+        "feelslike_c": 9.7,
+        "humidity": 35,
+        "wind_kph": 12.2,
+        "condition": {
+          "text": "Partly Cloudy"
+        },
+        "air_quality": {
+          "co": 1041.85,
+          "pm2_5": 91.15,
+          "pm10": 104.05
+        }
+      }
+    }
+  },
+  {
+    "id": 6,
+    "source": "CoinGecko",
+    "timestamp": "2026-03-24T11:24:46+00:00",
+    "data": {
+      "id": "bitcoin",
+      "symbol": "btc",
+      "name": "Bitcoin",
+      "current_price": 70993.0,
+      "market_cap": 1.419907055169E12,
+      "price_change_24h": 514.78,
+      "price_change_percentage_24h": 0.73041,
+      "last_updated": "2026-03-24T11:24:22.156Z"
+    }
+  },
+  {
+    "id": 7,
+    "source": "CoinGecko",
+    "timestamp": "2026-03-24T11:24:46+00:00",
+    "data": {
+      "id": "ethereum",
+      "symbol": "eth",
+      "name": "Ethereum",
+      "current_price": 2156.81,
+      "market_cap": 2.60118571993E11,
+      "price_change_24h": 2.9,
+      "price_change_percentage_24h": 0.13487,
+      "last_updated": "2026-03-24T11:24:24.680Z",
+      "roi": {
+        "times": 39.6229095567787,
+        "currency": "btc",
+        "percentage": 3962.29095567787
+      }
+    }
+  },
+  {
+    "id": 8,
+    "source": "OpenExchangeRates",
+    "timestamp": "2026-03-24T11:24:50+00:00",
+    "data": {
+      "disclaimer": "Usage subject to terms: https://openexchangerates.org/terms",
+      "license": "https://openexchangerates.org/license",
+      "timestamp": 1774350000,
+      "base": "USD",
+      "rates": {
+        "CNY": 6.8915,
+        "EUR": 0.862648,
+        "GBP": 0.745965,
+        "RUB": 80.498577
+      }
+    }
+  },
+  {
+    "id": 9,
+    "source": "WeatherAPI",
+    "timestamp": "2026-03-24T11:24:57+00:00",
+    "data": {
+      "location": {
+        "name": "Moscow",
+        "country": "Russia",
+        "localtime": "2026-03-24 14:24"
+      },
+      "current": {
+        "temp_c": 11.2,
+        "feelslike_c": 9.7,
+        "humidity": 35,
+        "wind_kph": 12.2,
+        "condition": {
+          "text": "Partly Cloudy"
+        },
+        "air_quality": {
+          "co": 1041.85,
+          "pm2_5": 91.15,
+          "pm10": 104.05
+        }
+      }
+    }
+  },
+  {
+    "id": 10,
+    "source": "CoinGecko",
+    "timestamp": "2026-03-24T11:24:57+00:00",
+    "data": {
+      "id": "bitcoin",
+      "symbol": "btc",
+      "name": "Bitcoin",
+      "current_price": 70993.0,
+      "market_cap": 1.419907055169E12,
+      "price_change_24h": 514.78,
+      "price_change_percentage_24h": 0.73041,
+      "last_updated": "2026-03-24T11:24:22.156Z"
+    }
+  },
+  {
+    "id": 11,
+    "source": "CoinGecko",
+    "timestamp": "2026-03-24T11:24:57+00:00",
+    "data": {
+      "id": "ethereum",
+      "symbol": "eth",
+      "name": "Ethereum",
+      "current_price": 2156.81,
+      "market_cap": 2.60118571993E11,
+      "price_change_24h": 2.9,
+      "price_change_percentage_24h": 0.13487,
+      "last_updated": "2026-03-24T11:24:24.680Z",
+      "roi": {
+        "times": 39.6229095567787,
+        "currency": "btc",
+        "percentage": 3962.29095567787
+      }
+    }
+  },
+  {
+    "id": 12,
+    "source": "OpenExchangeRates",
+    "timestamp": "2026-03-24T11:25:02+00:00",
+    "data": {
+      "disclaimer": "Usage subject to terms: https://openexchangerates.org/terms",
+      "license": "https://openexchangerates.org/license",
+      "timestamp": 1774350000,
+      "base": "USD",
+      "rates": {
+        "CNY": 6.8915,
+        "EUR": 0.862648,
+        "GBP": 0.745965,
+        "RUB": 80.498577
+      }
+    }
+  }
+]

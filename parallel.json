@@ -1,0 +1,107 @@
+[
+  {
+    "id": 1,
+    "source": "CoinGecko",
+    "timestamp": "2026-04-07T11:47:02+00:00",
+    "data": {
+      "id": "bitcoin",
+      "symbol": "btc",
+      "name": "Bitcoin",
+      "current_price": 68401.0,
+      "market_cap": 1.368618001398E12,
+      "price_change_24h": -1236.0552699833352,
+      "price_change_percentage_24h": -1.775,
+      "last_updated": "2026-04-07T11:46:32.010Z"
+    }
+  },
+  {
+    "id": 2,
+    "source": "CoinGecko",
+    "timestamp": "2026-04-07T11:47:02+00:00",
+    "data": {
+      "id": "ethereum",
+      "symbol": "eth",
+      "name": "Ethereum",
+      "current_price": 2089.67,
+      "market_cap": 2.52150589749E11,
+      "price_change_24h": -60.97607004276324,
+      "price_change_percentage_24h": -2.83525,
+      "last_updated": "2026-04-07T11:46:31.968Z",
+      "roi": {
+        "times": 39.84483557104431,
+        "currency": "btc",
+        "percentage": 3984.483557104431
+      }
+    }
+  },
+  {
+    "id": 3,
+    "source": "CoinGecko",
+    "timestamp": "2026-04-07T11:47:06+00:00",
+    "data": {
+      "id": "bitcoin",
+      "symbol": "btc",
+      "name": "Bitcoin",
+      "current_price": 68401.0,
+      "market_cap": 1.368618001398E12,
+      "price_change_24h": -1236.0552699833352,
+      "price_change_percentage_24h": -1.775,
+      "last_updated": "2026-04-07T11:46:32.010Z"
+    }
+  },
+  {
+    "id": 4,
+    "source": "CoinGecko",
+    "timestamp": "2026-04-07T11:47:06+00:00",
+    "data": {
+      "id": "ethereum",
+      "symbol": "eth",
+      "name": "Ethereum",
+      "current_price": 2089.67,
+      "market_cap": 2.52150589749E11,
+      "price_change_24h": -60.97607004276324,
+      "price_change_percentage_24h": -2.83525,
+      "last_updated": "2026-04-07T11:46:31.968Z",
+      "roi": {
+        "times": 39.84483557104431,
+        "currency": "btc",
+        "percentage": 3984.483557104431
+      }
+    }
+  },
+  {
+    "id": 5,
+    "source": "CoinGecko",
+    "timestamp": "2026-04-07T11:47:10+00:00",
+    "data": {
+      "id": "bitcoin",
+      "symbol": "btc",
+      "name": "Bitcoin",
+      "current_price": 68401.0,
+      "market_cap": 1.368618001398E12,
+      "price_change_24h": -1236.0552699833352,
+      "price_change_percentage_24h": -1.775,
+      "last_updated": "2026-04-07T11:46:32.010Z"
+    }
+  },
+  {
+    "id": 6,
+    "source": "CoinGecko",
+    "timestamp": "2026-04-07T11:47:10+00:00",
+    "data": {
+      "id": "ethereum",
+      "symbol": "eth",
+      "name": "Ethereum",
+      "current_price": 2089.67,
+      "market_cap": 2.52150589749E11,
+      "price_change_24h": -60.97607004276324,
+      "price_change_percentage_24h": -2.83525,
+      "last_updated": "2026-04-07T11:46:31.968Z",
+      "roi": {
+        "times": 39.84483557104431,
+        "currency": "btc",
+        "percentage": 3984.483557104431
+      }
+    }
+  }
+]

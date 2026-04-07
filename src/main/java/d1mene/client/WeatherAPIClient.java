@@ -3,24 +3,31 @@ package d1mene.client;
 import com.google.gson.JsonObject;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
-public class WeatherAPIClient implements APIClient {
-    private static final String BASE_URL = "https://api.weatherapi.com/v1/current.json";
-    private final String API_KEY;
+public class WeatherAPIClient extends AbstractAPIClient {
+
+    private static final String PROD_URL = "https://api.weatherapi.com/v1/current.json";
+    private final String apiKey;
 
     public WeatherAPIClient(String apiKey) {
-        API_KEY = apiKey;
+        super(PROD_URL);
+        this.apiKey = apiKey;
+    }
+
+    WeatherAPIClient(String apiKey, String baseUrl) {
+        super(baseUrl);
+        this.apiKey = apiKey;
     }
 
     @Override
-    public String getSourceName() {
-        return "WeatherAPI";
-    }
+    public String getSourceName() { return "WeatherAPI"; }
 
     @Override
     public JsonObject fetchData(Map<String, String> params) throws IOException {
-        params.put("key", API_KEY);
-        return buildRequestAndResponse(BASE_URL, params);
+        Map<String, String> mutableParams = new HashMap<>(params);
+        mutableParams.put("key", apiKey);
+        return buildRequestAndExecute(mutableParams).getAsJsonObject();
     }
 }
